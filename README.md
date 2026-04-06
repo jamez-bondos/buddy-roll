@@ -21,7 +21,7 @@ buddy-roll brute-forces random userIDs until one produces the buddy you want, th
 1. **Backup** your existing `~/.claude.json`
 2. **Write** the new `userID`
 3. **Remove** `oauthAccount.accountUuid` (so the custom userID takes priority)
-4. **Add a shell function** that strips `accountUuid` on each Claude launch
+4. **Add a `claude` alias** that strips `accountUuid` on each Claude launch
 
 ## Commands
 
@@ -75,7 +75,7 @@ duck, goose, blob, cat, dragon, octopus, owl, penguin, turtle, snail, ghost, axo
 npx buddy-roll restore
 ```
 
-This restores your original `~/.claude.json` and removes the shell function from your rc file.
+This restores your original `~/.claude.json` and removes the `claude` alias from your rc file.
 
 ## License
 
