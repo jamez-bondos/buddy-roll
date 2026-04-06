@@ -44,10 +44,11 @@ npx buddy-roll --species dragon --rarity legendary --shiny --dry-run
 | 参数 | 说明 |
 |---|---|
 | `--species <name>` | 目标物种（非交互模式必填） |
-| `--rarity <level>` | 目标稀有度（common/uncommon/rare/epic/legendary） |
-| `--eye <style>` | 目标眼睛样式 |
+| `--rarity <level>` | 目标稀有度（common/uncommon/rare/epic/legendary，默认：legendary） |
+| `--eye <style>` | 目标眼睛样式（`·`, `✦`, `×`, `◉`, `@`, `°`） |
 | `--hat <type>` | 目标帽子（crown, tophat, propeller, halo, wizard, beanie, tinyduck） |
 | `--shiny` | 要求闪光 |
+| `--yes, -y` | 跳过确认提示（用于脚本） |
 | `--max <number>` | 最大搜索次数（默认：20,000,000） |
 | `--dry-run` | 预览变更，不实际修改 |
 | `--lang en\|zh` | 强制指定语言 |
