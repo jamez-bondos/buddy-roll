@@ -963,6 +963,7 @@ function parseArgs(argv) {
       case "--max": args.max = parseInt(argv[++i]); break;
       case "--lang": LANG = argv[++i]; break;
       case "--dry-run": args.dryRun = true; break;
+      case "--yes": case "-y": args.yes = true; break;
     }
     i++;
   }
