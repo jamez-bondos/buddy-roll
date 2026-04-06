@@ -890,6 +890,7 @@ ${b}非交互模式：${r}
                        halo, wizard, beanie, tinyduck
   --shiny              要求闪光
   --max <number>       最大搜索次数（默认 20000000）
+  --yes, -y            跳过确认（用于脚本）
 
 ${b}选项：${r}
   --lang en|zh         强制语言
@@ -919,6 +920,7 @@ ${b}Non-interactive:${r}
                        halo, wizard, beanie, tinyduck
   --shiny              Require shiny
   --max <number>       Max search attempts (default: 20000000)
+  --yes, -y            Skip confirmation (for scripts)
 
 ${b}Options:${r}
   --lang en|zh         Force language
