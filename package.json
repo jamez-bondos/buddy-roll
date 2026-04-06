@@ -1,6 +1,6 @@
 {
   "name": "buddy-roll",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "One-click Claude Code buddy customizer. No binary patching.",
   "type": "module",
   "bin": {
@@ -13,10 +13,23 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "keywords": ["claude", "claude-code", "buddy", "companion", "reroll", "pet", "customizer"],
+  "keywords": [
+    "claude",
+    "claude-code",
+    "buddy",
+    "companion",
+    "reroll",
+    "pet",
+    "customizer"
+  ],
   "author": "jamezbondos",
   "license": "MIT",
-  "files": ["bin/", "README.md", "README.zh-CN.md", "LICENSE"],
+  "files": [
+    "bin/",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jamez-bondos/buddy-roll.git"
