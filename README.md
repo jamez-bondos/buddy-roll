@@ -44,10 +44,11 @@ npx buddy-roll --species dragon --rarity legendary --shiny --dry-run
 | Flag | Description |
 |---|---|
 | `--species <name>` | Target species (required for non-interactive) |
-| `--rarity <level>` | Target rarity (common/uncommon/rare/epic/legendary) |
-| `--eye <style>` | Target eye style |
+| `--rarity <level>` | Target rarity (common/uncommon/rare/epic/legendary, default: legendary) |
+| `--eye <style>` | Target eye style (`·`, `✦`, `×`, `◉`, `@`, `°`) |
 | `--hat <type>` | Target hat (crown, tophat, propeller, halo, wizard, beanie, tinyduck) |
 | `--shiny` | Require shiny |
+| `--yes, -y` | Skip confirmation prompt (for scripts) |
 | `--max <number>` | Max search attempts (default: 20,000,000) |
 | `--dry-run` | Preview changes without applying |
 | `--lang en\|zh` | Force language |

@@ -151,7 +151,7 @@ run_combo() {
   # 2. Apply (non-interactive, common duck = fast)
   clean_combo
   setup_config
-  LANG=en node "$BIN" --species duck --rarity common --max 100000 2>/dev/null
+  LANG=en node "$BIN" --species duck --rarity common --max 100000 --yes 2>/dev/null
 
   # 3. Verify config modified
   local config
@@ -181,7 +181,7 @@ run_combo() {
   # Reset config with accountUuid (simulating Claude Code writing it back)
   setup_config
   # Re-apply to get rc file back
-  LANG=en node "$BIN" --species duck --rarity common --max 100000 2>/dev/null
+  LANG=en node "$BIN" --species duck --rarity common --max 100000 --yes 2>/dev/null
 
   local shell_out
   shell_out=$("$shell_path" -c "source $rc_file; claude --test-arg 2>&1" 2>&1 || true)
@@ -194,7 +194,7 @@ run_combo() {
 
   # 8. Env var forwarding through function
   setup_config
-  LANG=en node "$BIN" --species duck --rarity common --max 100000 2>/dev/null
+  LANG=en node "$BIN" --species duck --rarity common --max 100000 --yes 2>/dev/null
   shell_out=$("$shell_path" -c "source $rc_file; CLAUDE_CODE_NO_FLICKER=1 claude --skip 2>&1" 2>&1 || true)
   assert_contains "env var forwarded" "CLAUDE_CODE_NO_FLICKER=1" "$shell_out"
   assert_contains "args with env" "--skip" "$shell_out"

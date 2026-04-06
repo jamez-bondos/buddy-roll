@@ -195,6 +195,7 @@ function parseArgs(argv) {
       case "--shiny": args.shiny = true; break;
       case "--max": args.max = parseInt(argv[++i]); break;
       case "--dry-run": args.dryRun = true; break;
+      case "--yes": case "-y": args.yes = true; break;
     }
     i++;
   }
@@ -530,6 +531,21 @@ describe("parseArgs", () => {
       strictEqual(args.shiny, true);
       strictEqual(args.max, 5000000);
       strictEqual(args.dryRun, true);
+    });
+
+    it("--yes flag", () => {
+      const args = parseArgs(argv("--species", "cat", "--yes"));
+      strictEqual(args.yes, true);
+    });
+
+    it("-y shorthand", () => {
+      const args = parseArgs(argv("--species", "cat", "-y"));
+      strictEqual(args.yes, true);
+    });
+
+    it("yes defaults to undefined", () => {
+      const args = parseArgs(argv("--species", "cat"));
+      strictEqual(args.yes, undefined);
     });
   });
 
