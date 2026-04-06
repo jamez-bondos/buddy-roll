@@ -676,6 +676,28 @@ async function confirm(rl, prompt) {
   return ans.trim().toLowerCase().startsWith("y");
 }
 
+function showApplyDetails(resultId, config, dryRun) {
+  const idShort = resultId.slice(0, 8) + "..." + resultId.slice(-8);
+  console.log(`\n${c.yellow}⚠  ${t("willModify")}：${c.reset}`);
+  console.log(`  ${c.cyan}~/.claude.json${c.reset}`);
+  console.log(`    - ${t("modifyUserID")}: ${idShort}`);
+  console.log(`    - ${t("removeUuid")}`);
+  console.log(`    - ${t("removeCompanion")}`);
+  if (config.oauthAccount) {
+    const shell = detectShell();
+    if (shell) console.log(`  ${c.cyan}${shell.rcFile.replace(homedir(), "~")}${c.reset}\n    - ${t("addAlias")}`);
+  }
+  console.log(`\n${t("backupFiles")}：`);
+  console.log(`  ~/.claude.json.buddy-roll-backup  ${c.dim}${t("backupConfigDesc")}${c.reset}`);
+  console.log(`  ~/.buddy-roll-state.json          ${c.dim}${t("backupStateDesc")}${c.reset}`);
+  console.log(`\n${t("restoreHint")}：npx buddy-roll restore`);
+
+  if (dryRun) {
+    console.log(`\n${c.yellow}${t("dryRunBanner")}${c.reset}`);
+    console.log(`${c.dim}${t("dryRunHintRemove")}${c.reset}`);
+  }
+}
+
 async function interactiveMode(installType, dryRun, userMax) {
   const config = readConfig();
   if (!config) { console.error(`${c.red}✗${c.reset} ${t("configNotFound")}`); process.exit(1); }
@@ -766,25 +788,10 @@ async function interactiveMode(installType, dryRun, userMax) {
       break;
     }
 
-    const idShort = result.id.slice(0, 8) + "..." + result.id.slice(-8);
-    console.log(`\n${c.yellow}⚠  ${t("willModify")}：${c.reset}`);
-    console.log(`  ${c.cyan}~/.claude.json${c.reset}`);
-    console.log(`    - ${t("modifyUserID")}: ${idShort}`);
-    console.log(`    - ${t("removeUuid")}`);
-    console.log(`    - ${t("removeCompanion")}`);
-    if (config.oauthAccount) {
-      const shell = detectShell();
-      if (shell) console.log(`  ${c.cyan}${shell.rcFile.replace(homedir(), "~")}${c.reset}\n    - ${t("addAlias")}`);
-    }
-    console.log(`\n${t("backupFiles")}：`);
-    console.log(`  ~/.claude.json.buddy-roll-backup  ${c.dim}${t("backupConfigDesc")}${c.reset}`);
-    console.log(`  ~/.buddy-roll-state.json          ${c.dim}${t("backupStateDesc")}${c.reset}`);
-    console.log(`\n${t("restoreHint")}：npx buddy-roll restore`);
+    showApplyDetails(result.id, config, dryRun);
 
     if (dryRun) {
       rl.close();
-      console.log(`\n${c.yellow}${t("dryRunBanner")}${c.reset}`);
-      console.log(`${c.dim}${t("dryRunHintRemove")}${c.reset}`);
       return;
     }
 
@@ -1004,8 +1011,24 @@ async function nonInteractiveMode(args) {
   console.log(formatBuddy(result));
   console.log(`\n${c.dim}ID: ${result.id}${c.reset}`);
 
-  applyBuddy(result.id, args.dryRun);
-  if (!args.dryRun) setupAlias(config, args.dryRun);
+  showApplyDetails(result.id, config, args.dryRun);
+
+  if (args.dryRun) return;
+
+  if (!args.yes) {
+    const rl = createRL();
+    const ans = await ask(rl, `\n${t("applyConfirm")} ❯ `);
+    rl.close();
+    if (ans.trim().toLowerCase() !== "y") return;
+  }
+
+  applyBuddy(result.id, false);
+  if (existsSync(STATE_PATH)) {
+    const state = JSON.parse(readFileSync(STATE_PATH, "utf8"));
+    state.appliedUserID = result.id;
+    writeFileSync(STATE_PATH, JSON.stringify(state, null, 2));
+  }
+  setupAlias(config, false);
 
   console.log(`\n${c.green}${c.bold}${t("done")}${c.reset}`);
   console.log(`${c.dim}${t("undoHint")}${c.reset}`);
