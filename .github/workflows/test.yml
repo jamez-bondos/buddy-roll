@@ -1,0 +1,46 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  local-tests:
+    name: "Local tests (${{ matrix.os }})"
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install zsh (Linux only)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y zsh
+      - name: Run npm test (unit + alias)
+        run: npm test
+      - name: Skip interactive tests (requires TTY, local-only)
+        run: 'echo "Interactive tests skipped in CI (no TTY). Run locally with npm run test:interactive"'
+
+  integration-tests:
+    name: "Integration (${{ matrix.os }})"
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - uses: oven-sh/setup-bun@v2
+      - name: Install zsh (Linux only)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y zsh
+      - name: Run integration tests (CI-only)
+        run: bash test/integration.sh
