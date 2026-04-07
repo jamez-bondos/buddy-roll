@@ -923,6 +923,7 @@ ${b}用法：${r}
   npx buddy-roll current            查看当前宠物信息
   npx buddy-roll verify <id>        查看某个 ID 生成的宠物
   npx buddy-roll restore            恢复原始配置和宠物
+  npx buddy-roll apply <id>         直接应用一个已保存的 buddy ID
   npx buddy-roll help               显示帮助
 
 ${b}非交互模式：${r}
@@ -953,6 +954,7 @@ ${b}Usage:${r}
   npx buddy-roll current            Show current buddy info
   npx buddy-roll verify <id>        Check what buddy an ID produces
   npx buddy-roll restore            Restore original config and buddy
+  npx buddy-roll apply <id>         Apply a saved buddy ID directly
   npx buddy-roll help               Show this help
 
 ${b}Non-interactive:${r}
