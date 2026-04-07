@@ -34,6 +34,7 @@ buddy-roll brute-forces random userIDs until one produces the buddy you want, th
 | `npx buddy-roll current` | Show your current buddy info |
 | `npx buddy-roll verify <id>` | Check what buddy a given ID produces |
 | `npx buddy-roll restore` | Restore original config and buddy |
+| `npx buddy-roll apply <id>` | Apply a saved buddy ID directly |
 | `npx buddy-roll help` | Show help |
 
 ## Non-Interactive Mode
