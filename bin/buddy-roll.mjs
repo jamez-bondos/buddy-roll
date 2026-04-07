@@ -117,6 +117,8 @@ const STRINGS = {
   statesCleaned:   { en: "State files cleaned up", zh: "状态文件已清理" },
   speciesRequired: { en: "--species is required for non-interactive mode", zh: "非交互模式需要 --species 参数" },
   verifyNeedsId:   { en: "verify requires an ID argument", zh: "verify 需要一个 ID 参数" },
+  applyNeedsId:    { en: "apply requires an ID argument", zh: "apply 命令需要一个 ID 参数" },
+  applyInvalidId:  { en: "Invalid ID format: expected 64 hex characters, got %s chars", zh: "无效 ID 格式：需要 64 位十六进制字符，实际 %s 位" },
 };
 
 function t(key, ...args) {
@@ -848,6 +850,10 @@ function cmdCurrent() {
   }
 }
 
+function isValidBuddyId(id) {
+  return typeof id === "string" && /^[0-9a-f]{64}$/i.test(id);
+}
+
 function cmdVerify(id) {
   const installType = detectInstallType();
   const installLabel = installType === "native" ? "native binary" : "npm";
@@ -860,6 +866,48 @@ function cmdVerify(id) {
 
   const result = fullRoll(id, hashFn);
   console.log(formatBuddy(result));
+}
+
+async function cmdApply(args) {
+  if (!isValidBuddyId(args.applyId)) {
+    const len = typeof args.applyId === "string" ? args.applyId.length : 0;
+    console.error(`${c.red}✗${c.reset} ${t("applyInvalidId", len)}`);
+    process.exit(1);
+  }
+
+  const config = readConfig();
+  if (!config) { console.error(`${c.red}✗${c.reset} ${t("configNotFound")}`); process.exit(1); }
+  requireUserID(config);
+
+  const installType = detectInstallType();
+  const hashFn = hashFor(installType);
+  const result = { ...fullRoll(args.applyId, hashFn), id: args.applyId };
+
+  console.log("");
+  console.log(formatBuddy(result));
+  console.log(`\n${c.dim}ID: ${result.id}${c.reset}`);
+
+  showApplyDetails(result.id, config, args.dryRun);
+
+  if (args.dryRun) return;
+
+  if (!args.yes) {
+    const rl = createRL();
+    const ans = await ask(rl, `\n${t("applyConfirm")} ❯ `);
+    rl.close();
+    if (ans.trim().toLowerCase() !== "y") return;
+  }
+
+  applyBuddy(result.id, false);
+  if (existsSync(STATE_PATH)) {
+    const state = JSON.parse(readFileSync(STATE_PATH, "utf8"));
+    state.appliedUserID = result.id;
+    writeFileSync(STATE_PATH, JSON.stringify(state, null, 2));
+  }
+  setupAlias(config, false);
+
+  console.log(`\n${c.green}${c.bold}${t("done")}${c.reset}`);
+  console.log(`${c.dim}${t("undoHint")}${c.reset}`);
 }
 
 function cmdHelp() {
@@ -875,6 +923,7 @@ ${b}用法：${r}
   npx buddy-roll current            查看当前宠物信息
   npx buddy-roll verify <id>        查看某个 ID 生成的宠物
   npx buddy-roll restore            恢复原始配置和宠物
+  npx buddy-roll apply <id>         直接应用一个已保存的 buddy ID
   npx buddy-roll help               显示帮助
 
 ${b}非交互模式：${r}
@@ -905,6 +954,7 @@ ${b}Usage:${r}
   npx buddy-roll current            Show current buddy info
   npx buddy-roll verify <id>        Check what buddy an ID produces
   npx buddy-roll restore            Restore original config and buddy
+  npx buddy-roll apply <id>         Apply a saved buddy ID directly
   npx buddy-roll help               Show this help
 
 ${b}Non-interactive:${r}
@@ -954,6 +1004,7 @@ function parseArgs(argv) {
       case "verify": args.command = "verify"; args.verifyId = argv[3]; i = 4; break;
       case "restore": args.command = "restore"; i = 3; break;
       case "help": args.command = "help"; i = 3; break;
+      case "apply": args.command = "apply"; args.applyId = argv[3]; i = 4; break;
       default: args.verifyId = argv[2]; args.command = "verify"; i = 3; break;
     }
   }
@@ -1046,6 +1097,10 @@ async function main() {
     case "verify":
       if (!args.verifyId) exitWithHelp(t("verifyNeedsId"));
       cmdVerify(args.verifyId);
+      break;
+    case "apply":
+      if (!args.applyId) exitWithHelp(t("applyNeedsId"));
+      await cmdApply(args);
       break;
     case "interactive":
       if (args.species) {

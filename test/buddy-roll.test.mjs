@@ -169,6 +169,10 @@ function fullRoll(id, hashFn) {
   return { rarity, species, eye, hat, shiny, stats };
 }
 
+function isValidBuddyId(id) {
+  return typeof id === "string" && /^[0-9a-f]{64}$/i.test(id);
+}
+
 function parseArgs(argv) {
   const args = { command: "interactive" };
   let i = 2;
@@ -178,6 +182,7 @@ function parseArgs(argv) {
       case "verify": args.command = "verify"; args.verifyId = argv[3]; i = 4; break;
       case "restore": args.command = "restore"; i = 3; break;
       case "help": args.command = "help"; i = 3; break;
+      case "apply": args.command = "apply"; args.applyId = argv[3]; i = 4; break;
       default: args.verifyId = argv[2]; args.command = "verify"; i = 3; break;
     }
   }
@@ -487,6 +492,16 @@ describe("parseArgs", () => {
       const args = parseArgs(argv("help"));
       strictEqual(args.command, "help");
     });
+    it("apply <id>", () => {
+      const args = parseArgs(argv("apply", "a".repeat(64)));
+      strictEqual(args.command, "apply");
+      strictEqual(args.applyId, "a".repeat(64));
+    });
+    it("apply without id leaves applyId undefined", () => {
+      const args = parseArgs(argv("apply"));
+      strictEqual(args.command, "apply");
+      strictEqual(args.applyId, undefined);
+    });
   });
 
   describe("legacy --flag style", () => {
@@ -562,6 +577,39 @@ describe("parseArgs", () => {
       const args = parseArgs(argv());
       strictEqual(args.command, "interactive");
     });
+  });
+});
+
+describe("isValidBuddyId", () => {
+  it("accepts 64 lowercase hex chars", () => {
+    strictEqual(isValidBuddyId("0123456789abcdef".repeat(4)), true);
+  });
+  it("accepts 64 uppercase hex chars", () => {
+    strictEqual(isValidBuddyId("0123456789ABCDEF".repeat(4)), true);
+  });
+  it("accepts 64 mixed-case hex chars", () => {
+    strictEqual(isValidBuddyId("aF".repeat(32)), true);
+  });
+  it("rejects 63 chars", () => {
+    strictEqual(isValidBuddyId("a".repeat(63)), false);
+  });
+  it("rejects 65 chars", () => {
+    strictEqual(isValidBuddyId("a".repeat(65)), false);
+  });
+  it("rejects non-hex characters", () => {
+    strictEqual(isValidBuddyId("g".repeat(64)), false);
+    strictEqual(isValidBuddyId("a".repeat(63) + "z"), false);
+    strictEqual(isValidBuddyId("a".repeat(63) + "-"), false);
+  });
+  it("rejects empty string", () => {
+    strictEqual(isValidBuddyId(""), false);
+  });
+  it("rejects undefined", () => {
+    strictEqual(isValidBuddyId(undefined), false);
+  });
+  it("rejects non-string", () => {
+    strictEqual(isValidBuddyId(123), false);
+    strictEqual(isValidBuddyId(null), false);
   });
 });
 
