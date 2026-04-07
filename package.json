@@ -1,6 +1,6 @@
 {
   "name": "buddy-roll",
-  "version": "1.0.2-rc.0",
+  "version": "1.0.2-rc.1",
   "description": "One-click Claude Code buddy customizer. No binary patching.",
   "type": "module",
   "bin": {
