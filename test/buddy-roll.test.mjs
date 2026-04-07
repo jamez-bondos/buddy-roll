@@ -182,6 +182,7 @@ function parseArgs(argv) {
       case "verify": args.command = "verify"; args.verifyId = argv[3]; i = 4; break;
       case "restore": args.command = "restore"; i = 3; break;
       case "help": args.command = "help"; i = 3; break;
+      case "apply": args.command = "apply"; args.applyId = argv[3]; i = 4; break;
       default: args.verifyId = argv[2]; args.command = "verify"; i = 3; break;
     }
   }
@@ -490,6 +491,16 @@ describe("parseArgs", () => {
     it("help", () => {
       const args = parseArgs(argv("help"));
       strictEqual(args.command, "help");
+    });
+    it("apply <id>", () => {
+      const args = parseArgs(argv("apply", "a".repeat(64)));
+      strictEqual(args.command, "apply");
+      strictEqual(args.applyId, "a".repeat(64));
+    });
+    it("apply without id leaves applyId undefined", () => {
+      const args = parseArgs(argv("apply"));
+      strictEqual(args.command, "apply");
+      strictEqual(args.applyId, undefined);
     });
   });
 

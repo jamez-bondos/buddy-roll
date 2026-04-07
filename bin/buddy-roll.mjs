@@ -958,6 +958,7 @@ function parseArgs(argv) {
       case "verify": args.command = "verify"; args.verifyId = argv[3]; i = 4; break;
       case "restore": args.command = "restore"; i = 3; break;
       case "help": args.command = "help"; i = 3; break;
+      case "apply": args.command = "apply"; args.applyId = argv[3]; i = 4; break;
       default: args.verifyId = argv[2]; args.command = "verify"; i = 3; break;
     }
   }
