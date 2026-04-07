@@ -868,6 +868,48 @@ function cmdVerify(id) {
   console.log(formatBuddy(result));
 }
 
+async function cmdApply(args) {
+  if (!isValidBuddyId(args.applyId)) {
+    const len = typeof args.applyId === "string" ? args.applyId.length : 0;
+    console.error(`${c.red}✗${c.reset} ${t("applyInvalidId", len)}`);
+    process.exit(1);
+  }
+
+  const config = readConfig();
+  if (!config) { console.error(`${c.red}✗${c.reset} ${t("configNotFound")}`); process.exit(1); }
+  requireUserID(config);
+
+  const installType = detectInstallType();
+  const hashFn = hashFor(installType);
+  const result = { ...fullRoll(args.applyId, hashFn), id: args.applyId };
+
+  console.log("");
+  console.log(formatBuddy(result));
+  console.log(`\n${c.dim}ID: ${result.id}${c.reset}`);
+
+  showApplyDetails(result.id, config, args.dryRun);
+
+  if (args.dryRun) return;
+
+  if (!args.yes) {
+    const rl = createRL();
+    const ans = await ask(rl, `\n${t("applyConfirm")} ❯ `);
+    rl.close();
+    if (ans.trim().toLowerCase() !== "y") return;
+  }
+
+  applyBuddy(result.id, false);
+  if (existsSync(STATE_PATH)) {
+    const state = JSON.parse(readFileSync(STATE_PATH, "utf8"));
+    state.appliedUserID = result.id;
+    writeFileSync(STATE_PATH, JSON.stringify(state, null, 2));
+  }
+  setupAlias(config, false);
+
+  console.log(`\n${c.green}${c.bold}${t("done")}${c.reset}`);
+  console.log(`${c.dim}${t("undoHint")}${c.reset}`);
+}
+
 function cmdHelp() {
   const b = c.bold, r = c.reset;
   const eyes = EYES.join(", ");
@@ -1053,6 +1095,10 @@ async function main() {
     case "verify":
       if (!args.verifyId) exitWithHelp(t("verifyNeedsId"));
       cmdVerify(args.verifyId);
+      break;
+    case "apply":
+      if (!args.applyId) exitWithHelp(t("applyNeedsId"));
+      await cmdApply(args);
       break;
     case "interactive":
       if (args.species) {
