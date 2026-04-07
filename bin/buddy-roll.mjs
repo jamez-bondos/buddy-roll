@@ -848,6 +848,10 @@ function cmdCurrent() {
   }
 }
 
+function isValidBuddyId(id) {
+  return typeof id === "string" && /^[0-9a-f]{64}$/i.test(id);
+}
+
 function cmdVerify(id) {
   const installType = detectInstallType();
   const installLabel = installType === "native" ? "native binary" : "npm";

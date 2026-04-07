@@ -169,6 +169,10 @@ function fullRoll(id, hashFn) {
   return { rarity, species, eye, hat, shiny, stats };
 }
 
+function isValidBuddyId(id) {
+  return typeof id === "string" && /^[0-9a-f]{64}$/i.test(id);
+}
+
 function parseArgs(argv) {
   const args = { command: "interactive" };
   let i = 2;
@@ -562,6 +566,39 @@ describe("parseArgs", () => {
       const args = parseArgs(argv());
       strictEqual(args.command, "interactive");
     });
+  });
+});
+
+describe("isValidBuddyId", () => {
+  it("accepts 64 lowercase hex chars", () => {
+    strictEqual(isValidBuddyId("0123456789abcdef".repeat(4)), true);
+  });
+  it("accepts 64 uppercase hex chars", () => {
+    strictEqual(isValidBuddyId("0123456789ABCDEF".repeat(4)), true);
+  });
+  it("accepts 64 mixed-case hex chars", () => {
+    strictEqual(isValidBuddyId("aF".repeat(32)), true);
+  });
+  it("rejects 63 chars", () => {
+    strictEqual(isValidBuddyId("a".repeat(63)), false);
+  });
+  it("rejects 65 chars", () => {
+    strictEqual(isValidBuddyId("a".repeat(65)), false);
+  });
+  it("rejects non-hex characters", () => {
+    strictEqual(isValidBuddyId("g".repeat(64)), false);
+    strictEqual(isValidBuddyId("a".repeat(63) + "z"), false);
+    strictEqual(isValidBuddyId("a".repeat(63) + "-"), false);
+  });
+  it("rejects empty string", () => {
+    strictEqual(isValidBuddyId(""), false);
+  });
+  it("rejects undefined", () => {
+    strictEqual(isValidBuddyId(undefined), false);
+  });
+  it("rejects non-string", () => {
+    strictEqual(isValidBuddyId(123), false);
+    strictEqual(isValidBuddyId(null), false);
   });
 });
 
