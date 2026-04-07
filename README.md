@@ -1,5 +1,8 @@
 # buddy-roll
 
+[![Tests](https://github.com/jamez-bondos/buddy-roll/actions/workflows/test.yml/badge.svg)](https://github.com/jamez-bondos/buddy-roll/actions/workflows/test.yml)
+[![npm version](https://img.shields.io/npm/v/buddy-roll)](https://www.npmjs.com/package/buddy-roll)
+
 > One-click Claude Code buddy customizer. No binary patching.
 
 [中文文档](./README.zh-CN.md)

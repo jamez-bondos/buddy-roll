@@ -1,5 +1,8 @@
 # buddy-roll
 
+[![Tests](https://github.com/jamez-bondos/buddy-roll/actions/workflows/test.yml/badge.svg)](https://github.com/jamez-bondos/buddy-roll/actions/workflows/test.yml)
+[![npm version](https://img.shields.io/npm/v/buddy-roll)](https://www.npmjs.com/package/buddy-roll)
+
 > Claude Code Buddy 定制工具。一键定制，无需修改二进制文件。
 
 [English](./README.md)
