@@ -117,6 +117,8 @@ const STRINGS = {
   statesCleaned:   { en: "State files cleaned up", zh: "状态文件已清理" },
   speciesRequired: { en: "--species is required for non-interactive mode", zh: "非交互模式需要 --species 参数" },
   verifyNeedsId:   { en: "verify requires an ID argument", zh: "verify 需要一个 ID 参数" },
+  applyNeedsId:    { en: "apply requires an ID argument", zh: "apply 命令需要一个 ID 参数" },
+  applyInvalidId:  { en: "Invalid ID format: expected 64 hex characters, got %s chars", zh: "无效 ID 格式：需要 64 位十六进制字符，实际 %s 位" },
 };
 
 function t(key, ...args) {
