@@ -63,3 +63,4 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
