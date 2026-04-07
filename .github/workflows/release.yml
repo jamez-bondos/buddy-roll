@@ -37,7 +37,17 @@ jobs:
           fi
           echo "Version match: $PKG_VERSION"
       - name: Publish to npm
-        run: npm publish
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [[ "$PKG_VERSION" == *-* ]]; then
+            PRE_ID="${PKG_VERSION#*-}"     # 1.0.2-rc.0 -> rc.0
+            PRE_ID="${PRE_ID%%.*}"          # rc.0       -> rc
+            echo "Publishing prerelease under dist-tag: $PRE_ID"
+            npm publish --tag "$PRE_ID"
+          else
+            echo "Publishing stable under dist-tag: latest"
+            npm publish
+          fi
 
   github-release:
     name: Create GitHub Release
