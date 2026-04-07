@@ -219,6 +219,48 @@ run_combo() {
   export PATH="${PATH#$mock_bin_dir:}"
 }
 
+# Test apply <id> with --yes (independent of shell × install_type matrix)
+test_apply() {
+  echo ""
+  echo "=== test_apply ==="
+
+  clean_combo
+  setup_config
+
+  # Use a deterministic 64-hex ID
+  local APPLY_ID="0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+
+  # Need a mock claude in PATH so setupAlias doesn't fail (any of the existing mocks works)
+  local mock_bin_dir="$TMP_DIR/bin-apply"
+  mkdir -p "$mock_bin_dir"
+  cp "$TMP_DIR/mock-claude-binary" "$mock_bin_dir/claude"
+  chmod +x "$mock_bin_dir/claude"
+  export PATH="$mock_bin_dir:$PATH"
+  export SHELL="${ZSH_PATH:-$BASH_PATH}"
+
+  # Apply the ID
+  LANG=en node "$BIN" apply "$APPLY_ID" --yes 2>/dev/null
+
+  # Verify userID was written
+  local config
+  config=$(cat "$HOME/.claude.json")
+  assert_contains "apply set userID" "$APPLY_ID" "$config"
+  assert_not_contains "apply removed accountUuid" "fake-uuid-to-be-stripped" "$config"
+
+  # Test rejection of invalid ID
+  local err_out
+  err_out=$(LANG=en node "$BIN" apply not-a-valid-id 2>&1 || true)
+  assert_contains "rejects short ID" "Invalid ID format" "$err_out"
+
+  # Test rejection of missing ID
+  err_out=$(LANG=en node "$BIN" apply 2>&1 || true)
+  assert_contains "rejects missing ID" "apply requires an ID argument" "$err_out"
+
+  # Cleanup
+  LANG=en node "$BIN" restore 2>/dev/null
+  export PATH="${PATH#$mock_bin_dir:}"
+}
+
 echo "========================================"
 echo "buddy-roll Integration Tests ($(uname))"
 echo "========================================"
@@ -240,6 +282,8 @@ if [ -n "$BASH_PATH" ]; then
 else
   echo "SKIP: bash not available"
 fi
+
+test_apply
 
 echo ""
 echo "========================================"
